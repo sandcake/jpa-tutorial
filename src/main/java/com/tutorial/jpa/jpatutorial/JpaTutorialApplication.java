@@ -1,7 +1,9 @@
 package com.tutorial.jpa.jpatutorial;
 
 import com.tutorial.jpa.jpatutorial.entities.Country;
+import com.tutorial.jpa.jpatutorial.entities.Person;
 import com.tutorial.jpa.jpatutorial.repositories.CountryRepository;
+import com.tutorial.jpa.jpatutorial.repositories.PersonRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +30,38 @@ public class JpaTutorialApplication {
 	}
 
     @Bean
-	public CommandLineRunner demo(CountryRepository countries) {
+	public CommandLineRunner demo(CountryRepository countries, PersonRepository persons) {
         return (args) -> {
-            Country cameroon = new Country(Long.valueOf("1"), "Cameroon");
+            Country cameroon = new Country(new Long(1), "Cameroon");
             countries.save(cameroon);
 
-            // fetch all customers
+            Person popol = new Person(null, "Paul Biya", cameroon);
+            Person chantou = new Person(null, "Chantal Biya", cameroon);
+            persons.save(popol);
+            persons.save(chantou);
+
+            // fetch all countries
             log.info("Countries found with findAll():");
             log.info("-------------------------------");
             for (Country country : countries.findAll()) {
                 log.info(country.getId() + "- " + country.getName());
+            }
+            log.info("");
+
+            // fetch all persons
+            log.info("Persons found with findAll():");
+            log.info("-------------------------------");
+            for (Person person : persons.findAll()) {
+                log.info(person.getId() + "- " + person.getName());
+            }
+            log.info("");
+
+            // fetch all persons
+            log.info("Persons found with findByCountry Cameroon:");
+            log.info("-------------------------------");
+            Iterable<Person> cameroonians = persons.findByCountry(cameroon);
+            for (Person person : cameroonians) {
+                log.info(person.getId() + "- " + person.getName());
             }
             log.info("");
         };
